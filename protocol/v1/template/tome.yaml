@@ -14,12 +14,15 @@ assets:
 # contents - defines where the tome.gg  content can be found. This is
 # categorized by type of content.
 content:
-  # contexts - See https://tome.gg
-  contexts: contexts/
-  # mental models - See https://tome.gg
+  # training - Your individual reports per period (e.g. daily stand up reports)
+  training: training/
+  # evaluations - All of your evaluations are recorded here, segregated by file (
+  # each file represents an evaluator).
+  evaluations: evaluations/
+  # scenarios - Not yet implemented
+  scenarios: scenarios/
+  # mental models - Not yet implemented
   mental_models: mental-models/
-  # mappings - defines how mental models are related to certain contexts.
-  mappings: mappings/
 # apps - defines what tome.gg verified applications work for this data source.
 apps:
   # flash cards - See https://en.wikipedia.org/wiki/Anki_(software)

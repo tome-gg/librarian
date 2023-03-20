@@ -1,5 +1,9 @@
 # Journal
 
+## March 20, 2023
+
+
+
 ## December 18, 2022
 
 I've researched a bit on GitHub or git-based integrations for read/write. I think that it would be best if I avoid that market because I don't want to be focused on that kind of business (UI, interactions, etc).
