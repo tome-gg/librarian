@@ -1,6 +1,8 @@
-package librarian
+package pkg
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type (
 	// Directory defines a reference to an existing folder.
@@ -13,16 +15,22 @@ type (
 		Files []File `json:"files"`
 		// Error defines whether an error was found during validation.
 		Error error `json:"error"`
+		// ErroneousFiles defines the list of files with errors.
+		ErroneousFiles []File
 	}
 
 	// File defines a reference to an existing file.
 	File struct {
+		Directory *Directory 
 		// Filepath defines where the file is found.
 		Filepath string `json:"filepath"`
 		// Error defines whether an error was found during validation.
 		Error error `json:"error"`
 	}
+
+
 )
+
 
 // Status returns the status of the directory, whether it was valid or not.
 func (d *Directory) Status() string {

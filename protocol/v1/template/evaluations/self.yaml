@@ -8,19 +8,25 @@ tomegg:
 # Meta information about this report
 meta:
   dimensions:
-    alias: focus
-    type: focus
-    version: 0.1.0
-    definition: https://protocol.tome.gg/dimensions/focus/0.1.0
+    - alias: focus
+      name: focus
+      version: 0.1.0
+      definition: https://protocol.tome.gg/dimensions/focus/0.1.0
 
-content:
+evaluations:
   - id: 385d9c24-be5c-5032-a163-7ddab2d35a78
-    focus: 
-      score: 2
-      remarks: >
-        I was familiar with the concept already, but did not really get to
-        practice completely because I was too busy juggling a few things. In
-        that regard, I haven't really been able to focus.
+    measurements:
+      - dimension: focus
+        score: 2
+        remarks: >
+          I was familiar with the concept already, but did not really get to
+          practice completely because I was too busy juggling a few things. In
+          that regard, I haven't really been able to focus.
   - id: a7fd6a39-b857-585f-9233-85cec2027477
-    focus: 
-      score: 2
+    measurements:
+      - dimension: focus
+        score: 2
+  - id: non-existent-b857-585f-9233-85cec2027477
+    measurements:
+      - dimension: focus
+        score: 2

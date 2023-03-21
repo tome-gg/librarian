@@ -18,7 +18,7 @@ meta:
 
 content:
   - id: 385d9c24-be5c-5032-a163-7ddab2d35a78
-    date: 03-20-2023
+    datetime: 2023-03-20
     remarks: |
       No remarks so far.
     done_yesterday: |
@@ -28,7 +28,7 @@ content:
     blockers: |
       - None
   - id: a7fd6a39-b857-585f-9233-85cec2027477
-    date: 03-19-2023
+    datetime: 2023-03-19
     remarks: |
       No remarks so far.
     done_yesterday: |

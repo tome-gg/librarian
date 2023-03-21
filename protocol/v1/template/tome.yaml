@@ -26,7 +26,7 @@ content:
 # apps - defines what tome.gg verified applications work for this data source.
 apps:
   # flash cards - See https://en.wikipedia.org/wiki/Anki_(software)
-  flash_cards: flash-cards/
+  flash_cards: flash-cards/ 
   # examinations - Multiple choice based tool
   examinations: examinations/
 # ontology - defines where the ontology for the domain of this content can be found.

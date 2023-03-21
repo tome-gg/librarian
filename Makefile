@@ -1,6 +1,6 @@
 
 build:
-	@echo "Not yet prepared"
+	@go build -o tome ./protocol/v1/librarian/cmd
 
 local-build:
 	@go run ./protocol/v1/librarian/cmd/main.go
