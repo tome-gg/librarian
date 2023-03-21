@@ -80,6 +80,8 @@ func main() {
 							return errors[0]
 					}
 
+					fmt.Printf(" 🚀 [SUCCESS] Repository %s is valid!\n", directoryPath)
+
 					return nil
 				},
 			},

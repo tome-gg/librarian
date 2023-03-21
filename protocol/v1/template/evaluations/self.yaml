@@ -7,6 +7,11 @@ tomegg:
 
 # Meta information about this report
 meta:
+  evaluator:
+    name: Darren
+    socials:
+      email: darren@tome.gg
+      eth: sapalo.eth
   dimensions:
     - alias: focus
       name: focus
@@ -26,7 +31,7 @@ evaluations:
     measurements:
       - dimension: focus
         score: 2
-  - id: non-existent-b857-585f-9233-85cec2027477
+  - id: a7fd6a39-b857-585f-9233-85cec2027477
     measurements:
       - dimension: focus
         score: 2

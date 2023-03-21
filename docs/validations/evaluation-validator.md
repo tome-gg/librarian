@@ -13,4 +13,4 @@ Source: `protocol/v1/librarian/validator/training-dsu-validator.go`
 
 ## Roadmap
 
-None yet.
+1. Prevent multiple evaluations from the same evaluator for the same training data.
