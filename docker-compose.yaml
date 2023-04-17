@@ -1,0 +1,7 @@
+version: '3'
+services:
+  librarian:
+    build:
+      dockerfile: app/lti/Dockerfile
+    ports:
+      - "8080:8080"

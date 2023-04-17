@@ -1,3 +1,5 @@
+package-image:
+	@docker-compose build
 
 build:
 	@go build -o tome ./protocol/v1/librarian/cmd

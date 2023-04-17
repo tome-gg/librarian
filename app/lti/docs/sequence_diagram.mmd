@@ -1,0 +1,26 @@
+sequenceDiagram
+    participant LMS
+    participant TP as Tool Provider
+    participant GH as GitHub
+
+    LMS->>TP: LTI Launch Request
+    activate TP
+    TP->>TP: Validate LTI request
+    TP->>LMS: Request user's GitHub access token (if needed)
+    LMS->>TP: Send user's GitHub access token (if needed)
+    TP->>TP: Establish user session
+    deactivate TP
+
+    LMS->>TP: Read learning/growth data
+    activate TP
+    TP->>GH: Fetch data from GitHub (e.g., files, issues)
+    GH->>TP: Return requested data
+    TP->>LMS: Send learning/growth data to LMS
+    deactivate TP
+
+    LMS->>TP: Write learning/growth data
+    activate TP
+    TP->>GH: Save data to GitHub (e.g., create/update files, issues)
+    GH->>TP: Acknowledge the write operation
+    TP->>LMS: Send success or failure status
+    deactivate TP
