@@ -8,6 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 	librarian "github.com/tome-gg/librarian/protocol/v1/librarian"
 	validator "github.com/tome-gg/librarian/protocol/v1/librarian/validator"
+
+	"os/exec"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -16,6 +19,59 @@ func main() {
 		Name:  "tome",
 		Usage: "The Tome.gg CLI for working with the Librarian protocol",
 		Commands: []*cli.Command{
+			{
+				Name: "initalize",
+				Aliases: []string{"init"},
+				Usage: "Initializes a new Git repository using the Tome.gg template, and then immediately clones it into a target directory.",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name: "name",
+						Aliases: []string{"n"},
+						Usage: "The name of the repository to be generated using the gh CLI tool.",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name: "destination",
+						Aliases: []string{"dest"},
+						Usage: "The directory path designating the target destination where the repository should be cloned locally.",
+						Required: true,
+					},
+					&cli.BoolFlag{
+						Name: "public",
+						Usage: "Initializes the GitHub repository as public. Defaults to a private repository.",
+					},
+				},
+				Action: func(ctx *cli.Context) error {
+					repositoryName := ctx.String("name")
+					directory := ctx.String("directory")
+					isPublic := ctx.Bool("public")
+
+					publicFlag := "--private"
+					if repositoryName == "" {
+						return fmt.Errorf("Invalid repository name")
+					}
+
+					if isPublic {
+						publicFlag = "--public"
+					}
+
+					cmd := exec.Command("gh", "repo", "create", repositoryName, "--template", "tome-gg/template",  publicFlag)
+					err := cmd.Run()
+					if err != nil {
+						logrus.Errorf("Initialize repository failed: %s", err)
+						return err
+					}
+
+					cmd = exec.Command("gh", "repo", "clone", repositoryName, directory)
+					err = cmd.Run()
+					if err != nil {
+						logrus.Errorf("Clone repository failed: %s", err)
+						return err
+					}
+
+					return nil
+				},
+			},
 			{
 				Name:    "validate",
 				Aliases: []string{"v"},
