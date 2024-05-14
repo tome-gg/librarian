@@ -1,8 +1,10 @@
 #!/bin/bash
 
+$VERSION="0.3.1"
+
 # Define the URLs for the binaries
-MAC_BINARY_URL="https://github.com/tome-gg/librarian/releases/download/0.3.0/tome-darwin-arm-osx-m1"
-LINUX_BINARY_URL="https://github.com/tome-gg/librarian/releases/download/0.3.0/tome-linux-amd64"
+MAC_BINARY_URL="https://github.com/tome-gg/librarian/releases/download/$VERSION/tome-darwin-arm-osx-m1"
+LINUX_BINARY_URL="https://github.com/tome-gg/librarian/releases/download/$VERSION/tome-linux-amd64"
 
 # Check if gh CLI tool is installed
 if ! command -v gh &> /dev/null; then
