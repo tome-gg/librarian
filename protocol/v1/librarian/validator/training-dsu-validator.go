@@ -92,12 +92,17 @@ func isRegisteredTraining(id string) bool {
 }
 
 func (m *dailyStandUpValidator) validateDSUEntry(e pkg.DSUReport) error {
-	
 	if strings.TrimSpace(e.DoingToday) == "" {
 		return ErrRequiredField(e.ID, "doing_today")
 	}
 	if strings.TrimSpace(e.DoneYesterday) == "" {
 		return ErrRequiredField(e.ID, "done_yesterday")
+	}
+	if strings.TrimSpace(e.DatetimeRaw) == "" {
+		return ErrRequiredField(e.ID, "datetime")
+	}
+	if strings.TrimSpace(e.ID) == "" {
+		return ErrRequiredField(e.ID, "id")
 	}
 	return nil
 }

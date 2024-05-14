@@ -15,8 +15,12 @@ import (
 )
 
 func main() {
+	cli.VersionPrinter = func(cCtx *cli.Context) {
+		fmt.Printf(" 📚 Tome.gg CLI; 🚀 version %s\n 🌎 Source: https://github.com/tome-gg/librarian\n 💜 Dreams of sustainability and freedom built from Manila\n\n", cCtx.App.Version)
+	}
 	app := &cli.App{
 		Name:  "tome",
+		Version: "0.3.0",
 		Usage: "The Tome.gg CLI for working with the Librarian protocol",
 		Commands: []*cli.Command{
 			{
@@ -74,7 +78,7 @@ func main() {
 			},
 			{
 				Name:    "validate",
-				Aliases: []string{"v"},
+				Aliases: []string{},
 				Usage:   "Validate a directory using the Librarian protocol",
 				Flags: []cli.Flag{
 					&cli.StringFlag{

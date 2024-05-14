@@ -1,7 +1,7 @@
 # PowerShell
 
 # Define the URL for the Windows binary
-$WINDOWS_BINARY_URL="https://github.com/tome-gg/librarian/releases/download/0.2.0/tome-win.exe"
+$WINDOWS_BINARY_URL="https://github.com/tome-gg/librarian/releases/download/0.3.0/tome-win.exe"
 
 # Check if gh CLI tool is installed
 if (!(Get-Command gh -ErrorAction SilentlyContinue)) {
