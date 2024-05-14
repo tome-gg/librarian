@@ -2,7 +2,7 @@ package validator
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -12,19 +12,28 @@ import (
 
 type dailyStandUpValidator struct {
 	log *logrus.Entry
+	plan *pkg.ValidationPlan
 }
 
-var registeredTraining []string
+type trainingValidator interface {
+	IsRegistered(path string) bool
+	IsValid(path string) bool
+}
 
 // File implements Validator
 func (m *dailyStandUpValidator) File(dir *pkg.File) error {
+
 	if strings.Contains(dir.Filepath, "dsu") == false {
 		return nil
 	}
 
+	m.log.
+	WithField("file", dir.Filepath).
+	Debugf("DSU evaluator - processing file")
+
 	m.log.Debugf("Files found: %+v", dir.Filepath)
 
-	fileBytes, err := ioutil.ReadFile(dir.Filepath)
+	fileBytes, err := os.ReadFile(dir.Filepath)
 
 	if err !=nil {
 		return err
@@ -66,12 +75,14 @@ func (m *dailyStandUpValidator) File(dir *pkg.File) error {
 	}
 
 	for _, e := range result.Content {
-		registeredTraining = append(registeredTraining, e.ID)
+		m.plan.Metadata["registeredTraining"] = append(m.plan.Metadata["registeredTraining"].([]string), e.ID)
 		m.log.WithField("training", e.ID).Debugf("registered training")
+
 		err := m.validateDSUEntry(e)
 		if err != nil {
 			return err
 		}
+		m.plan.Metadata["validTraining"] = append(m.plan.Metadata["validTraining"].([]string), e.ID)
 	}
 
 	m.log.
@@ -82,14 +93,6 @@ func (m *dailyStandUpValidator) File(dir *pkg.File) error {
 	return nil
 }
 
-func isRegisteredTraining(id string) bool {
-	for _, t := range registeredTraining {
-		if t == id {
-			return true
-		}
-	}
-	return false
-}
 
 func (m *dailyStandUpValidator) validateDSUEntry(e pkg.DSUReport) error {
 	if strings.TrimSpace(e.DoingToday) == "" {
@@ -117,11 +120,12 @@ func (m *dailyStandUpValidator) Directory(dir *pkg.Directory) error {
 }
 
 // NewDSUValidator ...
-func NewDSUValidator() Validator {
+func NewDSUValidator(plan *pkg.ValidationPlan) Validator {
 	return &dailyStandUpValidator{
 		log: logrus.WithFields(logrus.Fields{
 			"validator": "training",
 			"type": "dsu",
 		}),
+		plan: plan,
 	}
 }

@@ -2,7 +2,7 @@ package validator
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -12,6 +12,7 @@ import (
 
 type evaluationValidator struct {
 	log *logrus.Entry
+	plan *pkg.ValidationPlan
 }
 
 var registeredDimensions []string
@@ -22,9 +23,7 @@ func (m *evaluationValidator) File(dir *pkg.File) error {
 		return nil
 	}
 
-	m.log.Debugf("Files found: %+v", dir.Filepath)
-
-	fileBytes, err := ioutil.ReadFile(dir.Filepath)
+	fileBytes, err := os.ReadFile(dir.Filepath)
 	if err != nil {
 		return err
 	}
@@ -82,7 +81,11 @@ func (m *evaluationValidator) validateEvaluationRecord(eval pkg.EvaluationDefini
 		return ErrRequiredField(records.ID, "id")
 	}
 
-	if isRegisteredTraining(records.ID) == false {
+	if m.plan.IsRegistered(records.ID) == false {
+		return ErrTrainingNotFound(records.ID)
+	}
+
+	if m.plan.IsValid(records.ID) == false {
 		return ErrTrainingNotFound(records.ID)
 	}
 
@@ -130,10 +133,11 @@ func (m *evaluationValidator) Directory(dir *pkg.Directory) error {
 }
 
 // NewEvaluationValidator ...
-func NewEvaluationValidator() Validator {
+func NewEvaluationValidator(plan *pkg.ValidationPlan) Validator {
 	return &evaluationValidator{
 		log: logrus.WithFields(logrus.Fields{
 			"validator": "evaluation",
 		}),
+		plan: plan,
 	}
 }

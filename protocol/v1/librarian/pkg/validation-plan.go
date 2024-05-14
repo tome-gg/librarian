@@ -13,17 +13,67 @@ type (
 
 		Files []*File
 		FileWeights []int
+		Metadata map[string]interface{}
 	}
 )
 
 // NewValidationPlan ...
 func NewValidationPlan(ds []*Directory, fs []*File) *ValidationPlan {
-	return &ValidationPlan{
-		Directories: ds,
-		DirectoryWeights: []int{},
-		Files: fs,
-		FileWeights: []int{},
+	// Remove redundancies from fs and ds
+	uniqueDirs := make(map[string]*Directory)
+	var dedupedDirs []*Directory
+	for _, dir := range ds {
+		if _, exists := uniqueDirs[dir.Path]; !exists {
+			uniqueDirs[dir.Path] = dir
+			dedupedDirs = append(dedupedDirs, dir)
+		}
 	}
+	
+	// Remove redundancies from files
+	uniqueFiles := make(map[string]*File)
+	var dedupedFiles []*File
+	for _, file := range fs {
+		if _, exists := uniqueFiles[file.Filepath]; !exists {
+			uniqueFiles[file.Filepath] = file
+			dedupedFiles = append(dedupedFiles, file)
+		}
+	}
+
+	return &ValidationPlan{
+		Directories: dedupedDirs,
+		DirectoryWeights: []int{},
+		Files: dedupedFiles,
+		FileWeights: []int{},
+		Metadata: map[string]interface{}{
+			"registeredTraining": []string{},
+			"validTraining": []string{},
+		},
+	}
+}
+
+
+// IsRegistered returns true if the file has been registered.
+func (vp *ValidationPlan) IsRegistered(path string) bool {
+	if rt, ok := vp.Metadata["registeredTraining"].([]string); ok {
+		for _, t := range rt {
+			if t == path {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// IsValid returns true if the file is valid.
+func (vp *ValidationPlan) IsValid(path string) bool {
+	if vt, ok := vp.Metadata["validTraining"].([]string); ok {
+		for _, t := range vt {
+			if t == path {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 

@@ -20,7 +20,7 @@ func main() {
 	}
 	app := &cli.App{
 		Name:  "tome",
-		Version: "0.3.0",
+		Version: "0.3.1",
 		Usage: "The Tome.gg CLI for working with the Librarian protocol",
 		Commands: []*cli.Command{
 			{
@@ -128,6 +128,10 @@ func main() {
 
 					plan := validator.Init(directory)
 					plan.Init()
+
+					logrus.WithFields(logrus.Fields{
+						"plan": plan,
+					}).Debug("plan initialized")
 
 					errors := validator.ValidatePlan(plan)
 

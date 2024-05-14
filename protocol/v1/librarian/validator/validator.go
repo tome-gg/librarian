@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/tome-gg/librarian/protocol/v1/librarian/pkg"
 )
 
@@ -15,17 +16,13 @@ type (
 	}
 )
 
-
-func init() {
-	_ = registerValidators()
-}
-
 var validators []Validator
 
-func registerValidators() error {
+func registerValidators(_ *pkg.Directory, plan *pkg.ValidationPlan) error {
+
 	validators = []Validator{
-		NewDSUValidator(),
-		NewEvaluationValidator(),
+		NewDSUValidator(plan),
+		NewEvaluationValidator(plan),
 	}
 	return nil
 }
@@ -44,15 +41,21 @@ func Init(root *pkg.Directory) *pkg.ValidationPlan {
 		}
 	}
 
-	result := pkg.NewValidationPlan(dirs, files)
+	plan := pkg.NewValidationPlan(dirs, files)
 
-	return result
+	registerValidators(root, plan)
+
+	return plan
 }
 
 // ValidatePlan ...
 func ValidatePlan(vp *pkg.ValidationPlan) []error {
+
+	logrus.Debugf("Validating the plan: Step 1 - validate directories")
+	
 	es := []error{}
 	for _, d := range vp.Directories {
+		logrus.Debugf("Validating dir: %s", d.Path)
 		for _, validator := range validators {
 			err := validator.Directory(d)
 			if err != nil {
@@ -64,7 +67,14 @@ func ValidatePlan(vp *pkg.ValidationPlan) []error {
 		}
 	}
 
+	logrus.Debugf("Validating the plan: Step 2 - validate files")
+
 	for _, f := range vp.Files {
+		logrus.Debugf("File to be validated: %s", f.Filepath)
+	}
+
+	for _, f := range vp.Files {
+		logrus.Debugf("Validating file: %s", f.Filepath)
 		for _, validator := range validators {
 			err := validator.File(f)
 			if err != nil {
