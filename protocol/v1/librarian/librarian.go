@@ -1,7 +1,6 @@
 package librarian
 
 import (
-	"fmt"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -115,9 +114,6 @@ func Parse(rootDirectory string) (*pkg.Directory, error) {
 			// }
 		}
 
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-		}
 		return err
 	})
 

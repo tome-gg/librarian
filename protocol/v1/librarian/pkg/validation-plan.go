@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type (
@@ -37,6 +39,10 @@ func NewValidationPlan(ds []*Directory, fs []*File) *ValidationPlan {
 			uniqueFiles[file.Filepath] = file
 			dedupedFiles = append(dedupedFiles, file)
 		}
+	}
+
+	for _, f := range dedupedFiles {
+		logrus.Debugf("Files added: %s", f.Filepath)
 	}
 
 	return &ValidationPlan{

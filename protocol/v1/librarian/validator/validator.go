@@ -41,6 +41,10 @@ func Init(root *pkg.Directory) *pkg.ValidationPlan {
 		}
 	}
 
+	for _, f := range files {
+		logrus.Debugf("Files added: %s", f.Filepath)
+	}
+
 	plan := pkg.NewValidationPlan(dirs, files)
 
 	registerValidators(root, plan)
