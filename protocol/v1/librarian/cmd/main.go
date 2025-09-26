@@ -20,7 +20,7 @@ func main() {
 	}
 	app := &cli.App{
 		Name:  "tome",
-		Version: "0.4.1",
+		Version: "0.4.2",
 		Usage: "The Tome.gg CLI for working with the Librarian protocol",
 		Commands: []*cli.Command{
 			{
@@ -246,6 +246,56 @@ func main() {
 					}
 
 					return nil
+				},
+			},
+			{
+				Name:    "completion",
+				Usage:   "Generate shell completion scripts",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "fish",
+						Usage: "Generate fish completion script",
+						Action: func(c *cli.Context) error {
+							fmt.Println(`# Fish completion for tome
+complete -c tome -f
+
+# Main commands
+complete -c tome -n "__fish_use_subcommand" -a "init" -d "Initialize a new Git repository using the Tome.gg template"
+complete -c tome -n "__fish_use_subcommand" -a "initalize" -d "Initialize a new Git repository using the Tome.gg template"
+complete -c tome -n "__fish_use_subcommand" -a "missing-evaluations" -d "Find DSU entries that don't have corresponding self evaluations"
+complete -c tome -n "__fish_use_subcommand" -a "missing" -d "Find DSU entries that don't have corresponding self evaluations"
+complete -c tome -n "__fish_use_subcommand" -a "get-dsu" -d "Retrieve a DSU entry by its UUID"
+complete -c tome -n "__fish_use_subcommand" -a "get" -d "Retrieve a DSU entry by its UUID"
+complete -c tome -n "__fish_use_subcommand" -a "get-latest" -d "Retrieve the most recent DSU entry by date"
+complete -c tome -n "__fish_use_subcommand" -a "latest" -d "Retrieve the most recent DSU entry by date"
+complete -c tome -n "__fish_use_subcommand" -a "validate" -d "Validate a directory using the Librarian protocol"
+complete -c tome -n "__fish_use_subcommand" -a "completion" -d "Generate shell completion scripts"
+complete -c tome -n "__fish_use_subcommand" -a "help" -d "Shows a list of commands or help for one command"
+
+# Global options
+complete -c tome -l help -s h -d "Show help"
+complete -c tome -l version -s v -d "Print the version"
+
+# Directory flag for commands that support it
+complete -c tome -n "__fish_seen_subcommand_from missing-evaluations missing get-dsu get get-latest latest validate" -l directory -s d -d "Path to the directory" -r
+
+# UUID flag for get-dsu command
+complete -c tome -n "__fish_seen_subcommand_from get-dsu get" -l uuid -s u -d "UUID of the DSU entry to retrieve" -r
+
+# Init command flags
+complete -c tome -n "__fish_seen_subcommand_from init initalize" -l name -s n -d "The name of the repository" -r
+complete -c tome -n "__fish_seen_subcommand_from init initalize" -l destination -d "The directory path for cloning" -r
+complete -c tome -n "__fish_seen_subcommand_from init initalize" -l dest -d "The directory path for cloning" -r
+complete -c tome -n "__fish_seen_subcommand_from init initalize" -l public -d "Initialize as public repository"
+
+# Validate command flags
+complete -c tome -n "__fish_seen_subcommand_from validate" -l verbose -d "Enable verbose logging"
+
+# Completion subcommands
+complete -c tome -n "__fish_seen_subcommand_from completion" -a "fish" -d "Generate fish completion script"`)
+							return nil
+						},
+					},
 				},
 			},
 			{

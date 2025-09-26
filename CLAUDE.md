@@ -52,6 +52,30 @@ go run ./protocol/v1/librarian/cmd/main.go init --name my-repo --destination ./t
 # Get help
 go run ./protocol/v1/librarian/cmd/main.go --help
 go run ./protocol/v1/librarian/cmd/main.go validate --help
+
+# Generate shell completions
+go run ./protocol/v1/librarian/cmd/main.go completion fish > ~/.config/fish/completions/tome.fish
+```
+
+## Shell Completions
+
+### Fish Shell
+To install fish shell autocompletions for tome:
+
+```bash
+# Generate and install fish completions
+tome completion fish > ~/.config/fish/completions/tome.fish
+
+# Or during development
+go run ./protocol/v1/librarian/cmd/main.go completion fish > ~/.config/fish/completions/tome.fish
+```
+
+After installation, you'll get tab completion for:
+- All commands: `init`, `missing-evaluations`, `get-dsu`, `get-latest`, `validate`, `completion`
+- All aliases: `missing`, `get`, `latest`
+- All flags: `--directory`, `--uuid`, `--name`, `--verbose`, etc.
+- Context-aware completions based on the current command
+
 ```
 
 ## Core Architecture
@@ -154,7 +178,7 @@ For testing purposes, use the existing growth journal repository at:
 
 ## Version and Releases
 
-Current version: 0.4.1 (see `protocol/v1/librarian/cmd/main.go`)
+Current version: 0.4.2 (see `protocol/v1/librarian/cmd/main.go`)
 
 ### Release Process
 
