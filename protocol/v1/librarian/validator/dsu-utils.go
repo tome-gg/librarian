@@ -3,6 +3,7 @@ package validator
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/tome-gg/librarian/protocol/v1/librarian/pkg"
@@ -10,7 +11,8 @@ import (
 )
 
 // FindMissingEvaluations returns DSU entries that don't have corresponding self evaluations
-func FindMissingEvaluations(plan *pkg.ValidationPlan) ([]pkg.DSUReport, error) {
+// If limitToLast3 is true, returns only the 3 most recent entries in ascending order
+func FindMissingEvaluations(plan *pkg.ValidationPlan, limitToLast3 bool) ([]pkg.DSUReport, error) {
 	// First, collect all DSU entries
 	dsuEntries, err := getAllDSUEntries(plan)
 	if err != nil {
@@ -36,6 +38,16 @@ func FindMissingEvaluations(plan *pkg.ValidationPlan) ([]pkg.DSUReport, error) {
 		if !hasEvaluation {
 			missingEvaluations = append(missingEvaluations, dsu)
 		}
+	}
+
+	// Sort in ascending order by date
+	sort.Slice(missingEvaluations, func(i, j int) bool {
+		return missingEvaluations[i].Datetime.Before(missingEvaluations[j].Datetime)
+	})
+
+	// Limit to last 3 if requested
+	if limitToLast3 && len(missingEvaluations) > 3 {
+		missingEvaluations = missingEvaluations[len(missingEvaluations)-3:]
 	}
 
 	return missingEvaluations, nil

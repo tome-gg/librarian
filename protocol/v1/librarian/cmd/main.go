@@ -20,7 +20,7 @@ func main() {
 	}
 	app := &cli.App{
 		Name:  "tome",
-		Version: "0.4.2",
+		Version: "0.4.3",
 		Usage: "The Tome.gg CLI for working with the Librarian protocol",
 		Commands: []*cli.Command{
 			{
@@ -87,9 +87,14 @@ func main() {
 						Usage:       "Path to the directory to analyze",
 						DefaultText: "No directory specified. Use --help to see available commands.",
 					},
+					&cli.BoolFlag{
+						Name:  "all",
+						Usage: "Show all missing evaluations (default: show last 3 only)",
+					},
 				},
 				Action: func(c *cli.Context) error {
 					directoryPath := c.String("directory")
+					showAll := c.Bool("all")
 
 					if directoryPath == "" {
 						wd, err := os.Getwd()
@@ -112,7 +117,7 @@ func main() {
 					plan := validator.Init(directory)
 					plan.Init()
 
-					missingEvaluations, err := validator.FindMissingEvaluations(plan)
+					missingEvaluations, err := validator.FindMissingEvaluations(plan, !showAll)
 					if err != nil {
 						return fmt.Errorf("failed to find missing evaluations: %s", err)
 					}
@@ -122,7 +127,11 @@ func main() {
 						return nil
 					}
 
-					fmt.Printf("Found %d DSU entries without self evaluations:\n\n", len(missingEvaluations))
+					if showAll {
+						fmt.Printf("Found %d DSU entries without self evaluations (all entries):\n\n", len(missingEvaluations))
+					} else {
+						fmt.Printf("Found %d DSU entries without self evaluations (last 3, use --all for complete list):\n\n", len(missingEvaluations))
+					}
 					for _, entry := range missingEvaluations {
 						fmt.Printf("UUID: %s\nDate: %s\n\n", entry.ID, entry.Datetime.Format("2006-01-02 15:04:05"))
 					}
@@ -278,6 +287,9 @@ complete -c tome -l version -s v -d "Print the version"
 
 # Directory flag for commands that support it
 complete -c tome -n "__fish_seen_subcommand_from missing-evaluations missing get-dsu get get-latest latest validate" -l directory -s d -d "Path to the directory" -r
+
+# Missing evaluations flags
+complete -c tome -n "__fish_seen_subcommand_from missing-evaluations missing" -l all -d "Show all missing evaluations (default: show last 3 only)"
 
 # UUID flag for get-dsu command
 complete -c tome -n "__fish_seen_subcommand_from get-dsu get" -l uuid -s u -d "UUID of the DSU entry to retrieve" -r
