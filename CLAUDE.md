@@ -147,6 +147,11 @@ The CLI uses structured logging with logrus:
 - Default log level is WARN
 - Logs include structured fields for better debugging
 
+## Test Repository
+
+For testing purposes, use the existing growth journal repository at:
+`/Users/darrenkarlsapalo/git/github.com/darrensapalo/founder`
+
 ## Version and Releases
 
 Current version: 0.3.1 (see `protocol/v1/librarian/cmd/main.go`)

@@ -77,6 +77,122 @@ func main() {
 				},
 			},
 			{
+				Name:    "missing-evaluations",
+				Aliases: []string{"missing"},
+				Usage:   "Find DSU entries that don't have corresponding self evaluations",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "directory",
+						Aliases:     []string{"d"},
+						Usage:       "Path to the directory to analyze",
+						DefaultText: "No directory specified. Use --help to see available commands.",
+					},
+				},
+				Action: func(c *cli.Context) error {
+					directoryPath := c.String("directory")
+
+					if directoryPath == "" {
+						wd, err := os.Getwd()
+						if err != nil {
+							return fmt.Errorf("failed to get current working directory: %s", err)
+						}
+						directoryPath = wd
+					}
+
+					// Trim trailing slash
+					if directoryPath[len(directoryPath) - 1] == '/' {
+						directoryPath = directoryPath[:len(directoryPath)-1]
+					}
+
+					directory, err := librarian.Parse(directoryPath)
+					if err != nil {
+						return fmt.Errorf("failed to parse directory: %s", err)
+					}
+
+					plan := validator.Init(directory)
+					plan.Init()
+
+					missingEvaluations, err := validator.FindMissingEvaluations(plan)
+					if err != nil {
+						return fmt.Errorf("failed to find missing evaluations: %s", err)
+					}
+
+					if len(missingEvaluations) == 0 {
+						fmt.Println("✅ All DSU entries have corresponding self evaluations!")
+						return nil
+					}
+
+					fmt.Printf("Found %d DSU entries without self evaluations:\n\n", len(missingEvaluations))
+					for _, entry := range missingEvaluations {
+						fmt.Printf("UUID: %s\nDate: %s\n\n", entry.ID, entry.Datetime.Format("2006-01-02 15:04:05"))
+					}
+
+					return nil
+				},
+			},
+			{
+				Name:    "get-dsu",
+				Aliases: []string{"get"},
+				Usage:   "Retrieve a DSU entry by its UUID",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "directory",
+						Aliases:     []string{"d"},
+						Usage:       "Path to the directory to search",
+						DefaultText: "No directory specified. Use --help to see available commands.",
+					},
+					&cli.StringFlag{
+						Name:     "uuid",
+						Aliases:  []string{"u"},
+						Usage:    "UUID of the DSU entry to retrieve",
+						Required: true,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					directoryPath := c.String("directory")
+					uuid := c.String("uuid")
+
+					if directoryPath == "" {
+						wd, err := os.Getwd()
+						if err != nil {
+							return fmt.Errorf("failed to get current working directory: %s", err)
+						}
+						directoryPath = wd
+					}
+
+					// Trim trailing slash
+					if directoryPath[len(directoryPath) - 1] == '/' {
+						directoryPath = directoryPath[:len(directoryPath)-1]
+					}
+
+					directory, err := librarian.Parse(directoryPath)
+					if err != nil {
+						return fmt.Errorf("failed to parse directory: %s", err)
+					}
+
+					plan := validator.Init(directory)
+					plan.Init()
+
+					entry, err := validator.GetDSUByUUID(plan, uuid)
+					if err != nil {
+						return fmt.Errorf("failed to get DSU entry: %s", err)
+					}
+
+					fmt.Printf("UUID: %s\n", entry.ID)
+					fmt.Printf("Date: %s\n", entry.Datetime.Format("2006-01-02 15:04:05"))
+					fmt.Printf("Done Yesterday: %s\n", entry.DoneYesterday)
+					fmt.Printf("Doing Today: %s\n", entry.DoingToday)
+					if entry.Blockers != "" {
+						fmt.Printf("Blockers: %s\n", entry.Blockers)
+					}
+					if entry.Remarks != "" {
+						fmt.Printf("Remarks: %s\n", entry.Remarks)
+					}
+
+					return nil
+				},
+			},
+			{
 				Name:    "validate",
 				Aliases: []string{},
 				Usage:   "Validate a directory using the Librarian protocol",
