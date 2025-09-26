@@ -32,14 +32,14 @@ func Init(root *pkg.Directory) *pkg.ValidationPlan {
 
 	dirs := []*pkg.Directory{}
 	files := []*pkg.File{}
-	
-	for _, d := range root.Directories {
-		dirs = append(dirs, d)
-		
-		for _, f := range d.Files {
-			files = append(files, &f)
-		}
+
+	// Add root directory files
+	for i := range root.Files {
+		files = append(files, &root.Files[i])
 	}
+
+	// Recursively collect all directories and files
+	collectDirectoriesAndFiles(root, &dirs, &files)
 
 	for _, f := range files {
 		logrus.Debugf("Files added: %s", f.Filepath)
@@ -50,6 +50,21 @@ func Init(root *pkg.Directory) *pkg.ValidationPlan {
 	registerValidators(root, plan)
 
 	return plan
+}
+
+// collectDirectoriesAndFiles recursively collects all directories and files
+func collectDirectoriesAndFiles(dir *pkg.Directory, dirs *[]*pkg.Directory, files *[]*pkg.File) {
+	for _, d := range dir.Directories {
+		*dirs = append(*dirs, d)
+
+		// Add ALL files from this directory (not just the last one)
+		for i := range d.Files {
+			*files = append(*files, &d.Files[i])
+		}
+
+		// Recursively process subdirectories
+		collectDirectoriesAndFiles(d, dirs, files)
+	}
 }
 
 // ValidatePlan ...

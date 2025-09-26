@@ -178,7 +178,7 @@ For testing purposes, use the existing growth journal repository at:
 
 ## Version and Releases
 
-Current version: 0.4.3 (see `protocol/v1/librarian/cmd/main.go`)
+Current version: 0.4.4 (see `protocol/v1/librarian/cmd/main.go`)
 
 ### Release Process
 
