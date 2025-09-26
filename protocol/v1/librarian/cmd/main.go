@@ -20,7 +20,7 @@ func main() {
 	}
 	app := &cli.App{
 		Name:  "tome",
-		Version: "0.3.1",
+		Version: "0.4.1",
 		Usage: "The Tome.gg CLI for working with the Librarian protocol",
 		Commands: []*cli.Command{
 			{
@@ -178,6 +178,62 @@ func main() {
 						return fmt.Errorf("failed to get DSU entry: %s", err)
 					}
 
+					fmt.Printf("UUID: %s\n", entry.ID)
+					fmt.Printf("Date: %s\n", entry.Datetime.Format("2006-01-02 15:04:05"))
+					fmt.Printf("Done Yesterday: %s\n", entry.DoneYesterday)
+					fmt.Printf("Doing Today: %s\n", entry.DoingToday)
+					if entry.Blockers != "" {
+						fmt.Printf("Blockers: %s\n", entry.Blockers)
+					}
+					if entry.Remarks != "" {
+						fmt.Printf("Remarks: %s\n", entry.Remarks)
+					}
+
+					return nil
+				},
+			},
+			{
+				Name:    "get-latest",
+				Aliases: []string{"latest"},
+				Usage:   "Retrieve the most recent DSU entry by date",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "directory",
+						Aliases:     []string{"d"},
+						Usage:       "Path to the directory to search",
+						DefaultText: "No directory specified. Use --help to see available commands.",
+					},
+				},
+				Action: func(c *cli.Context) error {
+					directoryPath := c.String("directory")
+
+					if directoryPath == "" {
+						wd, err := os.Getwd()
+						if err != nil {
+							return fmt.Errorf("failed to get current working directory: %s", err)
+						}
+						directoryPath = wd
+					}
+
+					// Trim trailing slash
+					if directoryPath[len(directoryPath) - 1] == '/' {
+						directoryPath = directoryPath[:len(directoryPath)-1]
+					}
+
+					directory, err := librarian.Parse(directoryPath)
+					if err != nil {
+						return fmt.Errorf("failed to parse directory: %s", err)
+					}
+
+					plan := validator.Init(directory)
+					plan.Init()
+
+					entry, err := validator.GetLatestDSU(plan)
+					if err != nil {
+						return fmt.Errorf("failed to get latest DSU entry: %s", err)
+					}
+
+					fmt.Printf("🚀 Latest DSU Entry:\n\n")
 					fmt.Printf("UUID: %s\n", entry.ID)
 					fmt.Printf("Date: %s\n", entry.Datetime.Format("2006-01-02 15:04:05"))
 					fmt.Printf("Done Yesterday: %s\n", entry.DoneYesterday)

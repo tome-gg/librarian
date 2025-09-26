@@ -87,6 +87,28 @@ func getAllDSUEntries(plan *pkg.ValidationPlan) ([]pkg.DSUReport, error) {
 	return allEntries, nil
 }
 
+// GetLatestDSU retrieves the most recent DSU entry by date
+func GetLatestDSU(plan *pkg.ValidationPlan) (*pkg.DSUReport, error) {
+	dsuEntries, err := getAllDSUEntries(plan)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(dsuEntries) == 0 {
+		return nil, fmt.Errorf("no DSU entries found")
+	}
+
+	// Find the entry with the latest date
+	var latestEntry *pkg.DSUReport = &dsuEntries[0]
+	for i := 1; i < len(dsuEntries); i++ {
+		if dsuEntries[i].Datetime.After(latestEntry.Datetime) {
+			latestEntry = &dsuEntries[i]
+		}
+	}
+
+	return latestEntry, nil
+}
+
 // getAllEvaluationIDs collects all evaluation IDs from evaluation files
 func getAllEvaluationIDs(plan *pkg.ValidationPlan) ([]string, error) {
 	var allIDs []string

@@ -154,9 +154,36 @@ For testing purposes, use the existing growth journal repository at:
 
 ## Version and Releases
 
-Current version: 0.3.1 (see `protocol/v1/librarian/cmd/main.go`)
+Current version: 0.4.1 (see `protocol/v1/librarian/cmd/main.go`)
 
-Cross-platform binaries are built for:
+### Release Process
+
+**IMPORTANT**: Always bump the version number before creating a release:
+
+1. **Update version** in `protocol/v1/librarian/cmd/main.go` (line 23):
+   ```go
+   Version: "x.y.z",  // Update this line
+   ```
+
+2. **Commit the version bump**:
+   ```bash
+   git add protocol/v1/librarian/cmd/main.go
+   git commit -m "Bump version to vx.y.z"
+   git push
+   ```
+
+3. **Create GitHub release**:
+   ```bash
+   gh release create vx.y.z --title "vx.y.z - Release Title" --notes "Release notes..."
+   ```
+
+4. **Build and update local binary**:
+   ```bash
+   env GOOS=darwin GOARCH=arm64 go build -o tome-darwin-arm-osx-m1 ./protocol/v1/librarian/cmd
+   cp tome-darwin-arm-osx-m1 /usr/local/bin/tome
+   ```
+
+Cross-platform binaries are automatically built via GitHub Actions for:
 - macOS ARM64 (M1/M2)
 - Linux AMD64
 - Windows AMD64
