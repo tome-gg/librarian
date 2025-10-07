@@ -65,7 +65,7 @@ func (m *evaluationValidator) File(dir *pkg.File) error {
 	}
 
 	if len(result.Evaluations) == 0 {
-		logrus.Warnf("empty evaluations set")
+		logrus.WithField("file", dir.Filepath).Warnf("empty evaluations set")
 	}
 
 	for _, records := range result.Evaluations {
