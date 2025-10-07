@@ -62,12 +62,14 @@ func (m *dailyStandUpValidator) File(dir *pkg.File) error {
 		return ErrUnsupportedVersion
 	}
 
-	if result.Tomegg.Definition != fmt.Sprintf("https://protocol.tome.gg/%s/%s", result.Tomegg.Type, result.Tomegg.Version) {
-		return ErrMismatchedDefinition
+	expectedTomeggDef := fmt.Sprintf("https://protocol.tome.gg/%s/%s", result.Tomegg.Type, result.Tomegg.Version)
+	if result.Tomegg.Definition != expectedTomeggDef {
+		return ErrMismatchedTomeggDefinition(expectedTomeggDef, result.Tomegg.Definition)
 	}
 
-	if result.Meta.Format.Definition != fmt.Sprintf("https://protocol.tome.gg/formats/%s/%s", result.Meta.Format.Type, result.Meta.Format.Version) {
-		return ErrMismatchedDefinition
+	expectedFormatDef := fmt.Sprintf("https://protocol.tome.gg/formats/%s/%s", result.Meta.Format.Type, result.Meta.Format.Version)
+	if result.Meta.Format.Definition != expectedFormatDef {
+		return ErrMismatchedFormatDefinition(result.Meta.Format.Type, expectedFormatDef, result.Meta.Format.Definition)
 	}
 
 	if len(result.Content) == 0 {

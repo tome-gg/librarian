@@ -43,9 +43,11 @@ func (m *evaluationValidator) File(dir *pkg.File) error {
 		return ErrUnsupportedVersion
 	}
 
-	if result.Tomegg.Definition != fmt.Sprintf("https://protocol.tome.gg/%s/%s", result.Tomegg.Type, result.Tomegg.Version) {
-		logrus.Errorf("error: %s; on tomegg.definition = %s", ErrMismatchedDefinition, result.Tomegg.Definition)
-		return ErrMismatchedDefinition
+	expectedTomeggDef := fmt.Sprintf("https://protocol.tome.gg/%s/%s", result.Tomegg.Type, result.Tomegg.Version)
+	if result.Tomegg.Definition != expectedTomeggDef {
+		err := ErrMismatchedTomeggDefinition(expectedTomeggDef, result.Tomegg.Definition)
+		logrus.Error(err)
+		return err
 	}
 
 	if len(result.Meta.Dimensions) == 0 {
@@ -53,9 +55,11 @@ func (m *evaluationValidator) File(dir *pkg.File) error {
 	}
 
 	for _, dimension := range result.Meta.Dimensions {
-		if dimension.Definition != fmt.Sprintf("https://protocol.tome.gg/dimensions/%s/%s", dimension.Name, dimension.Version) {
-			logrus.Errorf("error: %s; on meta.dimensions.definition = %s", ErrMismatchedDefinition, dimension.Definition)
-			return ErrMismatchedDefinition
+		expectedDimensionDef := fmt.Sprintf("https://protocol.tome.gg/dimensions/%s/%s", dimension.Name, dimension.Version)
+		if dimension.Definition != expectedDimensionDef {
+			err := ErrMismatchedDimensionDefinition(dimension.Name, expectedDimensionDef, dimension.Definition)
+			logrus.Error(err)
+			return err
 		}
 		registeredDimensions = append(registeredDimensions, dimension.Name, dimension.Alias)
 	}
@@ -65,7 +69,7 @@ func (m *evaluationValidator) File(dir *pkg.File) error {
 	}
 
 	for _, records := range result.Evaluations {
-		err := m.validateEvaluationRecord(result, records)
+		err := m.validateEvaluationRecord(records)
 		if err != nil {
 			return err
 		}
@@ -76,7 +80,7 @@ func (m *evaluationValidator) File(dir *pkg.File) error {
 	return nil
 }
 
-func (m *evaluationValidator) validateEvaluationRecord(eval pkg.EvaluationDefinition[pkg.StandardMeasurement], records pkg.EvaluationRecord[pkg.StandardMeasurement]) error {
+func (m *evaluationValidator) validateEvaluationRecord(records pkg.EvaluationRecord[pkg.StandardMeasurement]) error {
 	if records.ID == "" {
 		return ErrRequiredField(records.ID, "id")
 	}
@@ -115,8 +119,7 @@ func (m *evaluationValidator) validateEvaluationRecord(eval pkg.EvaluationDefini
 		}
 
 		if isRegistered == false {
-			m.log.WithField("dimension", measure.Dimension).Error(ErrUnregisteredDimension)
-			return ErrUnregisteredDimension
+			m.log.WithField("dimension", measure.Dimension).Warn(ErrUnregisteredDimension)
 		}
 	}
 
