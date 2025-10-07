@@ -22,7 +22,7 @@ func main() {
 	}
 	app := &cli.App{
 		Name:  "tome",
-		Version: "0.4.6",
+		Version: "0.4.7",
 		Usage: "The Tome.gg CLI for working with the Librarian protocol",
 		Commands: []*cli.Command{
 			{
