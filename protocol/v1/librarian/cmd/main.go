@@ -3,15 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	librarian "github.com/tome-gg/librarian/protocol/v1/librarian"
+	"github.com/tome-gg/librarian/protocol/v1/librarian/pkg"
 	validator "github.com/tome-gg/librarian/protocol/v1/librarian/validator"
-
-	"os/exec"
-
 	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -379,6 +381,119 @@ complete -c tome -n "__fish_seen_subcommand_from completion" -a "fish" -d "Gener
 					}
 
 					fmt.Printf(" 🚀 [SUCCESS] Repository %s is valid!\n", directoryPath)
+
+					return nil
+				},
+			},
+			{
+				Name:    "dimensions",
+				Usage:   "Display all evaluation dimensions with their aliases, names, and labels",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "directory",
+						Aliases:     []string{"d"},
+						Usage:       "Target directory to scan for evaluation files",
+						DefaultText: "current directory",
+					},
+				},
+				Action: func(cCtx *cli.Context) error {
+					directoryPath := cCtx.String("directory")
+					if directoryPath == "" {
+						currentDir, err := os.Getwd()
+						if err != nil {
+							return fmt.Errorf("failed to get current directory: %s", err)
+						}
+						directoryPath = currentDir
+					}
+
+					directory, err := librarian.Parse(directoryPath)
+					if err != nil {
+						return fmt.Errorf("failed to parse directory %s: %s", directoryPath, err)
+					}
+
+					plan := validator.Init(directory)
+					plan.Init()
+
+					// Find evaluation files and extract dimensions
+					dimensions := make(map[string]struct {
+						Alias      string
+						Name       string
+						Version    string
+						Definition string
+					})
+
+					for _, file := range plan.Files {
+						if !strings.Contains(file.Filepath, "evaluations") || !strings.HasSuffix(file.Filepath, ".yaml") {
+							continue
+						}
+
+						fileBytes, err := os.ReadFile(file.Filepath)
+						if err != nil {
+							continue
+						}
+
+						var result pkg.EvaluationDefinition[pkg.StandardMeasurement]
+						err = yaml.Unmarshal(fileBytes, &result)
+						if err != nil {
+							continue
+						}
+
+						if result.Tomegg.Type != "evaluations" {
+							continue
+						}
+
+						for _, dim := range result.Meta.Dimensions {
+							dimensions[dim.Alias] = struct {
+								Alias      string
+								Name       string
+								Version    string
+								Definition string
+							}{
+								Alias:      dim.Alias,
+								Name:       dim.Name,
+								Version:    dim.Version,
+								Definition: dim.Definition,
+							}
+						}
+					}
+
+					if len(dimensions) == 0 {
+						fmt.Println("No evaluation dimensions found in this repository.")
+						return nil
+					}
+
+					fmt.Println("📏 Evaluation Dimensions")
+					fmt.Println("========================")
+					fmt.Println()
+					fmt.Println("Field Definitions:")
+					fmt.Println("  • Alias: Short identifier used in measurements (e.g., 'focus')")
+					fmt.Println("  • Name:  Machine-readable snake_case name used in URLs/definitions")
+					fmt.Println("  • Label: Human-readable title for display purposes")
+					fmt.Println()
+
+					// Sort dimensions by alias for consistent output
+					aliases := make([]string, 0, len(dimensions))
+					for alias := range dimensions {
+						aliases = append(aliases, alias)
+					}
+					sort.Strings(aliases)
+
+					for _, alias := range aliases {
+						dim := dimensions[alias]
+						
+						// Create human-readable label from snake_case name
+						labelWords := strings.Split(dim.Name, "_")
+						for i, word := range labelWords {
+							labelWords[i] = strings.Title(word)
+						}
+						label := strings.Join(labelWords, " ")
+
+						fmt.Printf("Alias: %s\n", dim.Alias)
+						fmt.Printf("Name:  %s\n", dim.Name)
+						fmt.Printf("Label: %s\n", label)
+						fmt.Printf("URL:   %s\n", dim.Definition)
+						fmt.Println()
+					}
 
 					return nil
 				},
